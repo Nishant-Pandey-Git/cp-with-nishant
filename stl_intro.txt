@@ -1,0 +1,367 @@
+/****************************************************************************
+ * 1. Overview of C++ STL
+ *
+ *    Definition:
+ *      - A set of template classes and functions for common data structures
+ *        (e.g., lists, stacks, arrays) and algorithms (e.g., sorting, searching).
+ *
+ *    Key Features:
+ *      - Provides iterators and functors that simplify working with algorithms
+ *        and containers.
+ *      - Implements generic, reusable code applicable to different data types.
+ *
+ *    History:
+ *      - Originally designed by Alexander Stepanov.
+ *      - Became part of the C++ standard in C++98.
+ ****************************************************************************/
+
+ /****************************************************************************
+ * 2. Components of STL
+ *
+ *    Major Components:
+ *      - Containers
+ *      - Algorithms
+ *      - Iterators
+ *      - Functors
+ *
+ *    Purpose:
+ *      - Designed for efficiency, flexibility, and reusability in modern 
+ *        C++ programming.
+ ****************************************************************************/
+
+ /****************************************************************************
+ * 3. Containers
+ *
+ *    Definition:
+ *      - Template-based data structures used to store objects and data.
+ *
+ *    Categories:
+ *
+ *      A. Sequence Containers:
+ *         - Definition:
+ *           * Store elements in a linear arrangement preserving insertion order.
+ *
+ *         1. Array:
+ *            - Implementation:
+ *              * A compile-time fixed-size container, allocated as a contiguous
+ *                block of memory (often on the stack).
+ *            - Pros:
+ *              * Extremely fast random access (O(1)); minimal memory overhead.
+ *            - Cons:
+ *              * Fixed size; cannot be resized dynamically.
+ *            - Common Usage:
+ *              * When the number of elements is known at compile time.
+ *            - Complexity:
+ *              * Access/Update: O(1)
+ *
+ *         2. Vector:
+ *            - Implementation:
+ *              * A dynamic array that allocates contiguous memory and resizes
+ *                (typically doubling capacity) when needed.
+ *            - Pros:
+ *              * Fast random access (O(1)); cache-friendly due to contiguous storage.
+ *            - Cons:
+ *              * Insertion/removal in the middle is O(n); occasional reallocations.
+ *            - Common Usage:
+ *              * When dynamic resizing and fast random access are required.
+ *            - Complexity:
+ *              * Random Access: O(1)
+ *              * Insert/Erase: O(n)
+ *
+ *         3. Deque (Double-Ended Queue):
+ *            - Implementation:
+ *              * Typically implemented as a list of contiguous memory blocks with
+ *                a separate index structure.
+ *            - Pros:
+ *              * Fast insertion and deletion at both front and back.
+ *            - Cons:
+ *              * Slightly more overhead in random access compared to vector.
+ *            - Common Usage:
+ *              * When you need to add/remove elements at both ends efficiently.
+ *            - Complexity:
+ *              * Random Access: O(1) (with a constant factor overhead)
+ *              * Push/Pop at ends: O(1)
+ *
+ *         4. List:
+ *            - Implementation:
+ *              * A doubly linked list where each node contains pointers to both
+ *                the previous and next elements.
+ *            - Pros:
+ *              * Constant time insertion and deletion at known positions.
+ *            - Cons:
+ *              * No random access; extra memory used for pointers; cache-unfriendly.
+ *            - Common Usage:
+ *              * When frequent insertions and deletions in the middle of the list are needed.
+ *            - Complexity:
+ *              * Insertion/Deletion: O(1) (given an iterator)
+ *              * Access by index: O(n)
+ *
+ *         5. Forward List:
+ *            - Implementation:
+ *              * A singly linked list with nodes that point only to the next element.
+ *            - Pros:
+ *              * Lower memory overhead than a doubly linked list; efficient at the front.
+ *            - Cons:
+ *              * Unidirectional traversal only; insertion before a given element is expensive.
+ *            - Common Usage:
+ *              * When minimal memory overhead is desired and only forward iteration is needed.
+ *            - Complexity:
+ *              * Insertion at front: O(1)
+ *              * General insertion/search: O(n)
+ *
+ *      B. Container Adaptors:
+ *         - Definition:
+ *           * Wrappers that restrict access to underlying container types to provide
+ *             specific interfaces (e.g., LIFO for stacks, FIFO for queues).
+ *
+ *         1. Stack:
+ *            - Implementation:
+ *              * Typically built on top of std::deque (default) or std::vector.
+ *            - Pros:
+ *              * Simple LIFO interface; hides the complexity of the underlying container.
+ *            - Cons:
+ *              * Limited access (only top element is accessible); no iteration.
+ *            - Common Usage:
+ *              * Function call stacks, backtracking algorithms.
+ *            - Complexity:
+ *              * Push/Pop: O(1)
+ *
+ *         2. Queue:
+ *            - Implementation:
+ *              * Usually implemented using std::deque.
+ *            - Pros:
+ *              * Provides FIFO behavior; simple interface.
+ *            - Cons:
+ *              * Only front and back elements are accessible.
+ *            - Common Usage:
+ *              * Task scheduling, breadth-first search.
+ *            - Complexity:
+ *              * Push/Pop: O(1)
+ *
+ *         3. Priority Queue:
+ *            - Implementation:
+ *              * Typically built upon a vector and uses a heap data structure (via functions
+ *                like std::make_heap, std::push_heap, std::pop_heap).
+ *            - Pros:
+ *              * Efficiently provides access to the highest (or lowest) priority element.
+ *            - Cons:
+ *              * Not suitable for full iteration in sorted order; internal structure is opaque.
+ *            - Common Usage:
+ *              * Scheduling tasks, algorithms like Dijkstra's shortest path.
+ *            - Complexity:
+ *              * Max/Min element: O(1)
+ *              * Insertion/Removal: O(log n)
+ *
+ *      C. Associative Containers:
+ *         - Definition:
+ *           * Store elements in a sorted order based on keys for fast retrieval and ordered iteration.
+ *
+ *         - Implementation:
+ *           * Typically implemented as self-balancing binary search trees (e.g., Red-Black Trees).
+ *         - Pros:
+ *           * Guarantees O(log n) operations (search, insertion, deletion); maintains sorted order.
+ *         - Cons:
+ *           * Generally slower than hash-based containers for lookup; higher overhead for balancing.
+ *         - Common Usage:
+ *           * When ordered data or range queries are required.
+ *         - Complexity:
+ *           * Insertion, Deletion, Search: O(log n)
+ *
+ *         1. Set:
+ *            - Stores unique sorted elements.
+ *
+ *         2. Map:
+ *            - Stores key-value pairs with unique keys, sorted by key.
+ *
+ *         3. Multiset:
+ *            - Similar to set but allows duplicate values.
+ *
+ *         4. Multimap:
+ *            - Similar to map but allows multiple values for the same key.
+ *
+ *      D. Unordered Associative Containers:
+ *         - Definition:
+ *           * Store elements using a hash table for very fast access, without any specific order.
+ *
+ *         - Implementation:
+ *           * Typically implemented using hash tables with buckets.
+ *         - Pros:
+ *           * Average-case constant time (O(1)) for most operations like insertion, deletion, and lookup.
+ *         - Cons:
+ *           * Worst-case O(n) due to hash collisions; no order is maintained.
+ *         - Common Usage:
+ *           * When order is not important but fast lookups are required.
+ *         - Complexity:
+ *           * Average: O(1) for insertion, deletion, search
+ *           * Worst-case: O(n)
+ *
+ *         1. Unordered Set:
+ *            - Stores unique keys.
+ *
+ *         2. Unordered Multiset:
+ *            - Allows duplicate keys.
+ *
+ *         3. Unordered Map:
+ *            - Stores key-value pairs with unique keys.
+ *
+ *         4. Unordered Multimap:
+ *            - Allows multiple values for the same key.
+ ****************************************************************************/
+
+ /****************************************************************************
+ * 4. Algorithms
+ *
+ *    Definition:
+ *      - Functions that perform operations on container elements.
+ *
+ *    Header Files:
+ *      - Defined in <algorithm> and <numeric>.
+ *
+ *    Types:
+ *      A. Manipulative Algorithms (modify or rearrange elements):
+ *         - copy: Copies elements from one range to another.
+ *           * Complexity: O(n)
+ *         - fill: Assigns a specified value to a range.
+ *           * Complexity: O(n)
+ *         - transform: Applies a function to each element in a range.
+ *           * Complexity: O(n)
+ *         - replace: Replaces occurrences of a specific value.
+ *           * Complexity: O(n)
+ *         - swap: Exchanges the values of two variables.
+ *           * Complexity: O(1)
+ *         - reverse: Reverses the order of elements.
+ *           * Complexity: O(n)
+ *         - rotate: Rotates elements so a specific element becomes first.
+ *           * Complexity: O(n)
+ *         - remove: Eliminates elements with a specified value without
+ *           resizing the container.
+ *           * Complexity: O(n)
+ *         - unique: Removes consecutive duplicate elements.
+ *           * Complexity: O(n)
+ *
+ *      B. Non-Manipulative Algorithms (do not modify elements):
+ *         - max_element: Finds the maximum element.
+ *           * Complexity: O(n)
+ *         - min_element: Finds the minimum element.
+ *           * Complexity: O(n)
+ *         - accumulate: Computes the sum of elements.
+ *           * Complexity: O(n)
+ *         - count: Counts occurrences of a given element.
+ *           * Complexity: O(n)
+ *         - find: Returns an iterator to the first occurrence of an element.
+ *           * Complexity: O(n)
+ *         - is_permutation: Checks if one range is a permutation of another.
+ *           * Complexity: O(n)
+ *         - is_sorted: Determines if elements are sorted in non-decreasing order.
+ *           * Complexity: O(n)
+ *         - partial_sum: Calculates the cumulative sum of elements.
+ *           * Complexity: O(n)
+ ****************************************************************************/
+
+ /****************************************************************************
+ * 5. Iterators
+ *
+ *    Definition:
+ *      - Pointer-like objects that traverse container elements.
+ *
+ *    Header File:
+ *      - Defined in <iterator>.
+ *
+ *    Types:
+ *      1. Input Iterators:
+ *         - Read values sequentially, moving forward only.
+ *      2. Output Iterators:
+ *         - Write values sequentially, moving forward only.
+ *      3. Forward Iterators:
+ *         - Combine both input and output functionalities.
+ *      4. Bidirectional Iterators:
+ *         - Allow both forward and backward movement.
+ *      5. Random Access Iterators:
+ *         - Support efficient random access in addition to bidirectional traversal.
+ ****************************************************************************/
+
+ /****************************************************************************
+ * 6. Functors
+ *
+ *    Definition:
+ *      - Objects that can be used as though they are functions by 
+ *        overloading the () operator.
+ *
+ *    Header File:
+ *      - Defined in <functional>.
+ *
+ *    Categories:
+ *      A. Arithmetic Functors:
+ *         1. plus: Returns the sum of two parameters.
+ *         2. minus: Returns the difference.
+ *         3. multiplies: Returns the product.
+ *         4. divides: Returns the quotient.
+ *         5. modulus: Returns the remainder.
+ *         6. negate: Returns the negated value.
+ *
+ *      B. Relational Functors:
+ *         1. equal_to: Returns true if two parameters are equal.
+ *         2. not_equal_to: Returns true if parameters are not equal.
+ *         3. greater: Returns true if the first parameter is greater.
+ *         4. greater_equal: Returns true if the first parameter is greater or equal.
+ *         5. less: Returns true if the first parameter is less.
+ *         6. less_equal: Returns true if the first parameter is less or equal.
+ *
+ *      C. Logical Functors:
+ *         1. logical_and: Performs Logical AND.
+ *         2. logical_or: Performs Logical OR.
+ *         3. logical_not: Performs Logical NOT.
+ *
+ *      D. Bitwise Functors:
+ *         1. bit_and: Performs Bitwise AND.
+ *         2. bit_or: Performs Bitwise OR.
+ *         3. bit_xor: Performs Bitwise XOR.
+ ****************************************************************************/
+
+ /****************************************************************************
+ * 7. Utility and Memory Library
+ *
+ *    Utility Library:
+ *      - Offers utilities such as pairs and tuples.
+ *
+ *    Memory Library:
+ *      - Functions:
+ *        * Includes std::move for efficient resource transfer.
+ *      - Smart Pointers:
+ *        * Provide safer memory management by wrapping raw pointers.
+ *      - Utility Functions:
+ *        * Examples include std::forward for efficient and safe code manipulation.
+ *      - Integer Sequence:
+ *        * Enables compile-time generation of integer sequences, useful in 
+ *          metaprogramming.
+ ****************************************************************************/
+
+ /****************************************************************************
+ * 8. Benefits of C++ STL
+ *
+ *    - Generic, Reusable Code:
+ *      * Write an algorithm once and reuse it across various data types.
+ *    - Flexibility:
+ *      * Customizable via templates, functors, and lambdas.
+ *    - Focus on Problem-Solving:
+ *      * Pre-implemented data structures and algorithms allow focusing on 
+ *        higher-level problem-solving rather than low-level coding details.
+ *    - Memory Management:
+ *      * Automated handling helps prevent memory leaks.
+ ****************************************************************************/
+
+ /****************************************************************************
+ * 9. Limitations of C++ STL
+ *
+ *    - Performance Overheads:
+ *      * Generic implementations may result in less efficient memory usage and 
+ *        execution compared to specialized solutions.
+ *    - Complex Debugging:
+ *      * Generic nature can lead to challenging debugging scenarios.
+ *    - Limited Memory Management Control:
+ *      * Provides less control over fine-grained memory management.
+ *    - Concurrency Support:
+ *      * Offers limited features for concurrent programming.
+ *    - Integration with Custom Data Structures:
+ *      * May be less flexible when integrating with custom data structures.
+ ****************************************************************************/
